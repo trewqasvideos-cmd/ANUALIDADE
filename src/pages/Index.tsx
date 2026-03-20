@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Upload, FileSpreadsheet, TrendingUp, Users, FlaskConical, DollarSign, LogOut, Lock, User } from 'lucide-react';
+import { Upload, FileSpreadsheet, TrendingUp, Users, FlaskConical, DollarSign, LogOut, Lock, User, Share2, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { parseExcelFile, type DashboardData } from '@/lib/parseExcel';
@@ -125,15 +125,41 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
 export default function Index() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [data, setData]             = useState<DashboardData | null>(null);
+  const [copied, setCopied]         = useState(false);
   const inputRef                    = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (localStorage.getItem(AUTH_KEY) === '1') setIsLoggedIn(true);
+
+    /* Checar se há dados na URL (link compartilhado) */
+    const params = new URLSearchParams(window.location.search);
+    const urlData = params.get('d');
+    if (urlData) {
+      try {
+        const decoded = JSON.parse(atob(urlData));
+        setData(decoded);
+        localStorage.setItem(DATA_KEY, JSON.stringify(decoded));
+        /* limpar URL sem recarregar */
+        window.history.replaceState({}, '', window.location.pathname);
+        return;
+      } catch { /* ignora */ }
+    }
+
     const saved = localStorage.getItem(DATA_KEY);
     if (saved) {
       try { setData(JSON.parse(saved)); } catch { /* ignora */ }
     }
   }, []);
+
+  const handleShare = () => {
+    if (!data) return;
+    const encoded = btoa(JSON.stringify(data));
+    const url = `${window.location.origin}${window.location.pathname}?d=${encoded}`;
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    });
+  };
 
   const handleLogin  = () => setIsLoggedIn(true);
   const handleLogout = () => {
@@ -196,6 +222,9 @@ export default function Index() {
             <input ref={inputRef} type="file" accept=".xlsx,.xls" className="hidden" onChange={handleFile} />
             <Button variant="outline" size="sm" onClick={() => inputRef.current?.click()} className="gap-2 active:scale-[0.97] transition-transform">
               <Upload className="h-4 w-4" /> Atualizar Dados
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleShare} className="gap-2 active:scale-[0.97] transition-transform" style={{ color: copied ? 'hsl(142, 72%, 40%)' : undefined }}>
+              {copied ? <><Check className="h-4 w-4" /> Link Copiado!</> : <><Share2 className="h-4 w-4" /> Compartilhar</>}
             </Button>
             <Button variant="ghost" size="sm" onClick={handleLogout} className="gap-2 text-muted-foreground hover:text-foreground">
               <LogOut className="h-4 w-4" /> Sair
