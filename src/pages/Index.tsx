@@ -136,7 +136,7 @@ export default function Index() {
     const urlData = params.get('d');
     if (urlData) {
       try {
-        const decoded = JSON.parse(atob(urlData));
+        const decoded = JSON.parse(decodeURIComponent(atob(urlData)));
         setData(decoded);
         localStorage.setItem(DATA_KEY, JSON.stringify(decoded));
         /* limpar URL sem recarregar */
@@ -153,7 +153,7 @@ export default function Index() {
 
   const handleShare = () => {
     if (!data) return;
-    const encoded = btoa(JSON.stringify(data));
+    const encoded = btoa(encodeURIComponent(JSON.stringify(data)));
     const url = `${window.location.origin}${window.location.pathname}?d=${encoded}`;
     navigator.clipboard.writeText(url).then(() => {
       setCopied(true);
