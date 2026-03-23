@@ -26,7 +26,6 @@ const BLUE_DARK  = 'hsl(210, 60%, 38%)';
 const BLUE_LIGHT = 'hsl(210, 40%, 88%)';
 const RED        = 'hsl(4, 80%, 56%)';
 const GREEN      = 'hsl(142, 72%, 40%)';
-const GOLD       = 'hsl(43, 80%, 50%)';
 
 function AnimatedCard({ children, className = '', delay = 0 }: {
   children: React.ReactNode; className?: string; delay?: number;
