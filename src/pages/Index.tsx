@@ -209,7 +209,7 @@ export default function Index() {
   ];
   const ticketMeta = 200;
   const cestaMeta  = 6;
-  const ROW2_H     = 'h-[400px]';
+  const ROW2_H     = 'h-[460px]';
 
   return (
     <div className="min-h-screen bg-background">
@@ -280,14 +280,27 @@ export default function Index() {
                 ].map(({ label, value, color, bold }) => (
                   <div key={label} className="flex items-baseline justify-between gap-2">
                     <span className="text-sm text-muted-foreground shrink-0">{label}</span>
-                    <span
-                      className="text-sm text-right leading-tight"
-                      style={{ color: color, fontWeight: bold ? 700 : 600 }}
-                    >
+                    <span className="text-sm text-right leading-tight" style={{ color, fontWeight: bold ? 700 : 600 }}>
                       {value}
                     </span>
                   </div>
                 ))}
+                {/* Tendência vs Meta */}
+                {(() => {
+                  const tendPct = data.metaAnual.metaAnual > 0
+                    ? (data.metaAnual.tendencia / data.metaAnual.metaAnual) * 100
+                    : 0;
+                  const acima = tendPct >= 100;
+                  const cor   = acima ? GREEN : RED;
+                  return (
+                    <div className="flex items-center justify-between gap-2 border-t pt-3 mt-1">
+                      <span className="text-sm text-muted-foreground shrink-0">Tendência vs Meta</span>
+                      <span className="flex items-center gap-1 text-sm font-bold" style={{ color: cor }}>
+                        {acima ? '▲' : '▼'} {tendPct.toFixed(1)}%
+                      </span>
+                    </div>
+                  );
+                })()}
               </div>
             </CardContent>
           </AnimatedCard>
