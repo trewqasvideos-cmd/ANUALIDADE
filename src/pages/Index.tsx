@@ -285,7 +285,7 @@ export default function Index() {
                     </span>
                   </div>
                 ))}
-                {/* Tendência vs Meta */}
+                {/* Tendência vs Meta + Crescimento vs Ano Anterior */}
                 {(() => {
                   const tendPct = data.metaAnual.metaAnual > 0
                     ? (data.metaAnual.tendencia / data.metaAnual.metaAnual) * 100
@@ -293,11 +293,16 @@ export default function Index() {
                   const acima = tendPct >= 100;
                   const cor   = acima ? GREEN : RED;
 
-                  const crescPct = data.metaAnual.faturamentoAA > 0
-                    ? ((data.metaAnual.tendencia - data.metaAnual.faturamentoAA) / data.metaAnual.faturamentoAA) * 100
-                    : 0;
-                  const crescendo = crescPct >= 0;
-                  const corCresc  = crescendo ? GREEN : RED;
+                  /* Crescimento real: soma os meses realizados este ano
+                     e compara com os mesmos meses do ano anterior */
+                  const mesesRealizados = data.mensal.filter(m => m.realizado > 0);
+                  const totalAtual      = mesesRealizados.reduce((s, m) => s + m.realizado, 0);
+                  const totalAA         = data.anoAnterior
+                    .slice(0, mesesRealizados.length)
+                    .reduce((s, m) => s + m.valor, 0);
+                  const crescPct    = totalAA > 0 ? ((totalAtual - totalAA) / totalAA) * 100 : 0;
+                  const crescendo   = crescPct >= 0;
+                  const corCresc    = crescendo ? GREEN : RED;
 
                   return (
                     <>
