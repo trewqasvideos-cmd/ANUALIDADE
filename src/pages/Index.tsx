@@ -292,13 +292,28 @@ export default function Index() {
                     : 0;
                   const acima = tendPct >= 100;
                   const cor   = acima ? GREEN : RED;
+
+                  const crescPct = data.metaAnual.faturamentoAA > 0
+                    ? ((data.metaAnual.tendencia - data.metaAnual.faturamentoAA) / data.metaAnual.faturamentoAA) * 100
+                    : 0;
+                  const crescendo = crescPct >= 0;
+                  const corCresc  = crescendo ? GREEN : RED;
+
                   return (
-                    <div className="flex items-center justify-between gap-2 border-t pt-3 mt-1">
-                      <span className="text-sm text-muted-foreground shrink-0">Tendência vs Meta</span>
-                      <span className="flex items-center gap-1 text-sm font-bold" style={{ color: cor }}>
-                        {acima ? '▲' : '▼'} {tendPct.toFixed(1)}%
-                      </span>
-                    </div>
+                    <>
+                      <div className="flex items-center justify-between gap-2 border-t pt-3 mt-1">
+                        <span className="text-sm text-muted-foreground shrink-0">Tendência vs Meta</span>
+                        <span className="flex items-center gap-1 text-sm font-bold" style={{ color: cor }}>
+                          {acima ? '▲' : '▼'} {tendPct.toFixed(1)}%
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-sm text-muted-foreground shrink-0">Crescimento vs A.A</span>
+                        <span className="flex items-center gap-1 text-sm font-bold" style={{ color: corCresc }}>
+                          {crescendo ? '▲' : '▼'} {Math.abs(crescPct).toFixed(1)}%
+                        </span>
+                      </div>
+                    </>
                   );
                 })()}
               </div>
@@ -310,14 +325,14 @@ export default function Index() {
             <CardHeader className="pb-1">
               <CardTitle className="text-sm font-semibold text-muted-foreground">Porta / Clínica</CardTitle>
             </CardHeader>
-            <CardContent className="flex flex-col items-center justify-between h-[calc(100%-52px)]">
-              <div className="h-56 w-full">
+            <CardContent className="flex flex-col items-center justify-center h-[calc(100%-52px)] gap-4">
+              <div className="h-64 w-full">
                 <ResponsiveContainer>
                   <PieChart>
                     <Pie
                       data={pieData} dataKey="value"
                       cx="50%" cy="50%"
-                      innerRadius={54} outerRadius={76}
+                      innerRadius={60} outerRadius={85}
                       paddingAngle={4}
                       label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                     >
