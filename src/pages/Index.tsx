@@ -293,16 +293,20 @@ export default function Index() {
                   const acima = tendPct >= 100;
                   const cor   = acima ? GREEN : RED;
 
-                  /* Crescimento real: soma os meses realizados este ano
-                     e compara com os mesmos meses do ano anterior */
+                  /* Crescimento real: média do crescimento mês a mês
+                     compara cada mês realizado com o mesmo mês do ano anterior */
                   const mesesRealizados = data.mensal.filter(m => m.realizado > 0);
-                  const totalAtual      = mesesRealizados.reduce((s, m) => s + m.realizado, 0);
-                  const totalAA         = data.anoAnterior
-                    .slice(0, mesesRealizados.length)
-                    .reduce((s, m) => s + m.valor, 0);
-                  const crescPct    = totalAA > 0 ? ((totalAtual - totalAA) / totalAA) * 100 : 0;
-                  const crescendo   = crescPct >= 0;
-                  const corCresc    = crescendo ? GREEN : RED;
+                  const crescimentosMes = mesesRealizados
+                    .map((m, i) => {
+                      const aa = data.anoAnterior[i]?.valor ?? 0;
+                      return aa > 0 ? ((m.realizado - aa) / aa) * 100 : null;
+                    })
+                    .filter((v): v is number => v !== null);
+                  const crescPct  = crescimentosMes.length > 0
+                    ? crescimentosMes.reduce((s, v) => s + v, 0) / crescimentosMes.length
+                    : 0;
+                  const crescendo  = crescPct >= 0;
+                  const corCresc   = crescendo ? GREEN : RED;
 
                   return (
                     <>
@@ -313,7 +317,7 @@ export default function Index() {
                         </span>
                       </div>
                       <div className="flex items-center justify-between gap-2">
-                        <span className="text-sm text-muted-foreground shrink-0">Crescimento vs A.A</span>
+                        <span className="text-sm text-muted-foreground shrink-0">Crescimento Médio vs A.A</span>
                         <span className="flex items-center gap-1 text-sm font-bold" style={{ color: corCresc }}>
                           {crescendo ? '▲' : '▼'} {Math.abs(crescPct).toFixed(1)}%
                         </span>
